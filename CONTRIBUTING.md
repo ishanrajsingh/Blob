@@ -15,34 +15,94 @@ Thank you for your interest in contributing to Blob! This guide will help you ge
 
 ## Getting Started
 
-### What You'll Need
+### What You'll Need (Prerequisites)
 
-Before you start, make sure you have these tools installed:
+Before you start, make sure you have these essential tools installed on your system:
 
-1. **Git** - For version control
-   - Download: https://git-scm.com/downloads
-   - Check if installed: `git --version`
+#### 1. Git (Version Control System)
 
-2. **Node.js** (version 18 or higher) - JavaScript runtime
-   - Download: https://nodejs.org/ (download the LTS version)
-   - Check if installed: `node --version`
+- **What it does**: Tracks code changes and manages different versions of your code
+- **Why you need it**: To clone the repository and submit your contributions
+- **Download**: [git-scm.com/downloads](https://git-scm.com/downloads)
+- **Verify installation**: Run `git --version` in your terminal
+- **Expected output**: `git version 2.x.x` or higher
 
-3. **pnpm** (version 8 or higher) - Package manager
-   - Install: `npm install -g pnpm`
-   - Check if installed: `pnpm --version`
+#### 2. Node.js (JavaScript Runtime)
 
-4. **Expo Go** - Mobile app for testing
-   - iOS: https://apps.apple.com/app/expo-go/id982107779
-   - Android: https://play.google.com/store/apps/details?id=host.exp.exponent
-   - Install this on your phone!
+- **What it does**: Executes JavaScript code outside the browser
+- **Why you need it**: Powers the API server, build tools, and all development scripts
+- **Minimum version required**: 18 or higher
+- **Download**: [nodejs.org](https://nodejs.org/) - Get the **LTS (Long Term Support)** version
+- **Verify installation**: Run `node --version` in your terminal
+- **Expected output**: `v18.x.x` or higher
 
-5. **Code Editor** - We recommend Neovim
-   - Download: https://neovim.io/
+#### 3. pnpm (Package Manager)
+
+- **What it does**: Installs and manages JavaScript packages/dependencies
+- **Why you need it**: This project uses pnpm for efficient monorepo workspace management
+- **Minimum version required**: 8 or higher
+- **Install**: Run `npm install -g pnpm` (after installing Node.js)
+- **Verify installation**: Run `pnpm --version` in your terminal
+- **Expected output**: `8.x.x` or `9.x.x`
+- **Why pnpm and not npm?**: Faster installs, better disk space usage, and monorepo support
+
+#### 4. Docker (Container Platform)
+
+- **What it does**: Runs applications in isolated containers
+- **Why you need it**: Provides a local PostgreSQL database for development
+- **Download**: [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+- **Verify installation**: Run `docker --version` in your terminal
+- **Expected output**: `Docker version 20.x.x` or higher
+- **IMPORTANT**: Make sure Docker Desktop is **running** (not just installed) before starting development
+- **How to check**: Run `docker ps` - should not show "Cannot connect to Docker daemon"
+
+#### 5. Expo Go (Mobile Testing App)
+
+- **What it does**: Allows you to test the mobile app on your actual phone
+- **Why you need it**: To see your changes in real-time on a mobile device
+- **Download**:
+  - iOS: [App Store](https://apps.apple.com/app/expo-go/id982107779)
+  - Android: [Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+- **Install this on your phone**, not your computer!
+- **Alternative**: You can use Android Studio Emulator or iOS Simulator (Mac only) instead
+
+#### 6. Code Editor (Your Choice)
+
+- **What it does**: Where you'll write and edit code
+- **Recommendations**:
+  - **Neovim**: [neovim.io](https://neovim.io/) - Lightweight, powerful, makes you look cool
+  - **VS Code**: [code.visualstudio.com](https://code.visualstudio.com/) - Beginner-friendly, feature-rich
+  - **Any editor you prefer** works fine!
 
 ### Optional Tools
 
-- **GitHub Desktop** - If you prefer a GUI for Git: https://desktop.github.com/
-- **Wrangler CLI** - For Cloudflare Workers (installed automatically with dependencies)
+- **GitHub Desktop**: If you prefer a GUI for Git instead of command line - [desktop.github.com](https://desktop.github.com/)
+- **Bun Runtime**: Alternative to Node.js for production builds - [bun.sh](https://bun.sh/) (optional, only needed for production deployment)
+- **Android Studio**: For Android emulator - [developer.android.com/studio](https://developer.android.com/studio)
+- **Xcode**: For iOS simulator (Mac only) - Available on Mac App Store
+
+### Quick Prerequisites Check
+
+Run these commands to verify everything is installed correctly:
+
+```bash
+# Check Node.js (should show v18 or higher)
+node --version
+
+# Check pnpm (should show 8.x or higher)
+pnpm --version
+
+# Check Git
+git --version
+
+# Check Docker (should show version number)
+docker --version
+
+# Check if Docker is running (should list containers or show empty list)
+docker ps
+```
+
+If any command fails or shows a lower version, install or update that tool before proceeding.
 
 ## Development Environment Setup
 
@@ -59,7 +119,27 @@ Before you start, make sure you have these tools installed:
    cd blob
    ```
 
-### Step 2: Install Dependencies
+### Step 2: Run the Automated Setup Script (Recommended)
+
+We provide an automated setup script that handles the entire development environment setup for you:
+
+```bash
+pnpm setup
+```
+
+This script will:
+
+- Check all prerequisites (Node.js, pnpm, Docker, Git)
+- Install all dependencies
+- Create environment files (.env and .dev.vars)
+- Start Docker containers (PostgreSQL)
+- Set up the database schema
+
+The script is fully interactive and cross-platform (Windows, macOS, Linux).
+
+**Alternatively, you can follow the manual setup steps below:**
+
+### Step 2 (Manual): Install Dependencies
 
 ```bash
 pnpm install
@@ -67,58 +147,106 @@ pnpm install
 
 This command will install all the necessary packages for the project. It might take a few minutes.
 
-### Step 3: Set Up Environment Variables
+### Step 3 (Manual): Set Up Environment Variables
 
-#### For the API (Backend)
+#### For the Root Project
 
-1. Navigate to the API directory:
+Create a `.env` file in the root directory:
 
-   ```bash
-   cd apps/api
-   ```
+```bash
+cp .env.example .env
+```
 
-2. Create a `.env` file (copy from the example):
+Edit the `.env` file. For local development with Docker, use:
 
-   ```bash
-   cp .env.example .env
-   ```
+```env
+# Database (local development with Docker)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/blob
 
-3. Edit `apps/api/.env` and add your configuration:
+# For production with Neon Postgres, replace with your Neon connection string:
+# DATABASE_URL=postgresql://user:password@host/database
+```
 
-   ```env
-   # Database connection
-   DATABASE_URL="your-neon-postgres-connection-string"
+#### For the API (Cloudflare Workers)
 
-   # Cloudflare Workers (optional for local dev)
-   # CLOUDFLARE_ACCOUNT_ID="your-account-id"
-   # CLOUDFLARE_API_TOKEN="your-api-token"
-   ```
+Create a `.env` file in the `apps/server` directory:
 
-   **Getting a Neon Postgres database:**
-   - Sign up at https://neon.tech (free tier available)
-   - Create a new project
-   - Copy the connection string
+```bash
+cd apps/server
+cp .env.example .env
+```
 
-#### For the Mobile App
+The `.env` file should contain the same database URL:
 
-1. Navigate to the mobile directory:
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/blob
+```
 
-   ```bash
-   cd apps/mobile
-   ```
+**Note**: You don't need to sign up for Neon Postgres for local development! We'll use Docker instead (see next step).
 
-2. Create a `.env` file:
+### Step 4: Start the Local Database
 
-   ```bash
-   cp .env.example .env
-   ```
+Start the PostgreSQL database using Docker:
 
-3. The app will automatically detect your local API server, so you don't need to configure anything for local development!
+```bash
+pnpm docker:up
+```
 
-### Step 4: Configure Your Firewall
+This command will:
+
+- Download the PostgreSQL Docker image (first time only)
+- Start a local PostgreSQL database on port 5432
+- Create a database named `blob`
+
+To check if the database is running:
+
+```bash
+docker ps
+```
+
+You should see a container named `blob-postgres` running.
+
+**Useful Docker commands:**
+
+```bash
+# Stop the database
+pnpm docker:down
+
+# View database logs
+pnpm docker:logs
+
+# Restart the database
+pnpm docker:restart
+```
+
+### Step 5: Set Up the Database Schema
+
+Push the database schema to your local database:
+
+```bash
+pnpm db:push
+```
+
+This creates all the necessary tables in your PostgreSQL database.
+
+**Other useful database commands:**
+
+```bash
+# Generate migrations
+pnpm db:generate
+
+# Run migrations
+pnpm db:migrate
+
+# Open Drizzle Studio (database GUI)
+pnpm db:studio
+```
+
+### Step 6: Configure Your Firewall
 
 **IMPORTANT**: You need to allow these ports through your firewall for the app to work:
 
+- **Port 5432** - PostgreSQL database (if accessing from other machines)
 - **Port 8081** - Expo development server
 - **Port 8787** - API server (Hono/Cloudflare Workers)
 
@@ -128,7 +256,7 @@ This command will install all the necessary packages for the project. It might t
 2. Click "Advanced settings"
 3. Click "Inbound Rules" → "New Rule"
 4. Select "Port" → Next
-5. Enter "8081, 8787" → Next
+5. Enter "5432, 8081, 8787" → Next
 6. Select "Allow the connection" → Next
 7. Check all network types → Next
 8. Name it "Blob Development" → Finish
@@ -139,11 +267,12 @@ macOS typically allows local network connections by default. If you have issues:
 
 1. Go to System Preferences → Security & Privacy → Firewall
 2. Click "Firewall Options"
-3. Ensure Node and Expo are allowed
+3. Ensure Node, Expo, and Docker are allowed
 
 #### Linux (ufw)
 
 ```bash
+sudo ufw allow 5432
 sudo ufw allow 8081
 sudo ufw allow 8787
 ```
@@ -151,29 +280,40 @@ sudo ufw allow 8787
 #### Linux (firewalld)
 
 ```bash
+sudo firewall-cmd --permanent --add-port=5432/tcp
 sudo firewall-cmd --permanent --add-port=8081/tcp
 sudo firewall-cmd --permanent --add-port=8787/tcp
 sudo firewall-cmd --reload
 ```
 
-### Step 5: Database Setup
-
-Run database migrations to set up your local database:
-
-```bash
-cd apps/api
-pnpm db:push
-```
-
-This creates all the necessary tables in your Neon Postgres database.
+### Step 6: Configure Your Firewall
 
 ## Running the Project Locally
 
-You'll need to run both the API server and the mobile app at the same time. turbo handles it for you, say thanks to turbo:
+You'll need to run both the API server and the mobile app at the same time. Turbo handles it for you, say thanks to turbo:
 
 ```bash
 pnpm dev
 ```
+
+This will start:
+
+- **API Server** on `http://0.0.0.0:8787` (Node.js runtime with hot reload)
+- **Mobile App** with Expo development server
+
+### About API Runtimes
+
+The API server uses **different runtimes for different environments**:
+
+- **Development**: Node.js with tsx (hot reload, better debugging, familiar tooling)
+- **Production**: Bun (faster startup, native performance, optimized for production)
+
+The server automatically detects which runtime it's running on and adapts accordingly. You don't need to do anything special - just run `pnpm dev` for development!
+
+**Why different runtimes?**
+
+- Node.js is better for development (mature tooling, extensive debugging support)
+- Bun is better for production (faster execution, lower memory usage)
 
 ### Testing on Your Phone
 
@@ -208,10 +348,9 @@ If you prefer to use an emulator instead of your phone:
 ```
 blob/
 ├── apps/
-│   ├── api/                 # Backend API server
+│   ├── server/                 # Backend API server
 │   │   ├── src/
-│   │   │   └── index.ts    # Main API entry point
-│   │   └── wrangler.jsonc  # Cloudflare Workers config
+│   │       └── index.ts    # Main API entry point
 │   │
 │   └── mobile/             # Mobile app
 │       ├── app/            # App screens (file-based routing)
@@ -221,12 +360,19 @@ blob/
 │       └── utils/          # Helper functions
 │
 ├── packages/
-│   └── trpc/              # Shared API types and router
+│   ├── db/                # Database package (Drizzle ORM)
+│   │   ├── src/
+│   │   │   ├── schema/    # Database schema definitions
+│   │   │   └── index.ts   # Database client
+│   │   └── drizzle.config.ts
+│   │
+│   └── api/              # Shared API types and router
 │       ├── src/
-│       │   ├── router.ts  # API route definitions
+│       │   ├── routers/   # API route definitions
 │       │   ├── server.ts  # tRPC server setup
 │       │   └── client.ts  # tRPC client setup
 │
+├── docker-compose.yml     # Local database configuration
 └── docs/                  # Documentation
 ```
 
@@ -234,7 +380,7 @@ blob/
 
 #### Adding a New API Endpoint
 
-1. Open `packages/trpc/src/router.ts`
+1. Open `packages/api/src/routers/index.ts`
 2. Add your new route:
 
 ```typescript
@@ -334,12 +480,47 @@ export function FlashCard({ question, answer }: FlashCardProps) {
 
 #### Database Changes
 
-1. Edit your schema in `apps/api/src/db/schema.ts` (you'll need to create this)
-2. Run migrations:
+1. Edit your schema in `packages/db/src/schema/` (e.g., create a new file for your table)
+
+   ```typescript
+   // packages/db/src/schema/flashcards.ts
+   import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+   export const flashcards = pgTable("flashcards", {
+     id: uuid("id").defaultRandom().primaryKey(),
+     question: text("question").notNull(),
+     answer: text("answer").notNull(),
+     createdAt: timestamp("created_at").defaultNow().notNull(),
+   });
+   ```
+
+2. Export the schema in `packages/db/src/schema/index.ts`:
+
+   ```typescript
+   export * from "./users";
+   export * from "./flashcards";
+   ```
+
+3. Push the changes to your database:
    ```bash
-   cd apps/api
    pnpm db:push
    ```
+
+**Using the database in your code:**
+
+```typescript
+import { db } from "@repo/db";
+import { flashcards } from "@repo/db/schema";
+
+// Insert a flashcard
+await db.insert(flashcards).values({
+  question: "What is 2+2?",
+  answer: "4",
+});
+
+// Query flashcards
+const allCards = await db.select().from(flashcards);
+```
 
 ## Submitting Your Contribution
 
@@ -524,7 +705,7 @@ pnpm format:check
 
 #### "Cannot connect to API"
 
-1. Make sure the API server is running (`cd apps/api && pnpm dev`)
+1. Make sure the API server is running (`cd apps/server && pnpm dev`)
 2. Check that ports 8081 and 8787 are open in your firewall
 3. Ensure your phone and computer are on the same Wi-Fi network
 4. Try restarting both servers
@@ -549,15 +730,23 @@ pnpm install
 
 #### Database Connection Error
 
-1. Check your `DATABASE_URL` in `apps/api/.env`
+1. Make sure Docker is running: `docker ps`
+2. Check if the database container is up: `pnpm docker:logs`
+3. Verify your `DATABASE_URL` in the root `.env` file
+4. Restart the database: `pnpm docker:restart`
+5. Try running migrations again: `pnpm db:push`
+
+**If using Neon Postgres (production):**
+
+1. Check your `DATABASE_URL` connection string
 2. Make sure your Neon database is running
-3. Try running migrations again: `pnpm db:push`
+3. Verify network connectivity to Neon
 
 #### TypeScript Errors
 
 ```bash
 # Rebuild types
-cd packages/trpc
+cd packages/api
 pnpm build
 ```
 
@@ -585,8 +774,8 @@ pnpm --version
 git --version
 
 # Error logs
-cd apps/api
-pnpm dev > api-error.log 2>&1
+cd apps/server
+pnpm dev > server-error.log 2>&1
 
 cd apps/mobile
 pnpm start > mobile-error.log 2>&1

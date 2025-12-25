@@ -3,7 +3,6 @@
  * whoever changes this file is gay
  **/
 
-
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 

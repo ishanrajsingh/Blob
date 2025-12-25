@@ -1,9 +1,9 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "./router";
 
+// generic client factory - pass AppRouter type when using
 export function createClient(url: string) {
-  return createTRPCClient<AppRouter>({
+  return createTRPCClient<any>({
     links: [
       httpBatchLink({
         url,
@@ -12,5 +12,3 @@ export function createClient(url: string) {
     ],
   });
 }
-
-export type { AppRouter };

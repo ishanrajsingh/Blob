@@ -10,9 +10,7 @@ import { getApiUrl } from '@/utils/api';
 export default function Home() {
   const helloQuery = trpc.hello.useQuery({ name: 'React Native' });
   const timeQuery = trpc.getTime.useQuery();
-
   const echoMutation = trpc.echo.useMutation();
-
   const handleEcho = () => {
     echoMutation.mutate({ message: 'Hello from mobile app!' });
   };
@@ -58,6 +56,7 @@ export default function Home() {
                 <Text className="mt-2 text-green-600">Response: {echoMutation.data.message}</Text>
               )}
             </View>
+
           </View>
         </ScreenContent>
         <Link href={{ pathname: '/details', params: { name: 'Dan' } }} asChild>
