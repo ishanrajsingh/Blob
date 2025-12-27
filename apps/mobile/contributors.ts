@@ -90,4 +90,9 @@ export const CONTRIBUTORS: Contributor[] = [
     name:'Yuvaraj Ragothaman',
     github:'LevelSilence',
   },
+  {
+    name:'Aiyaan Mahajan',
+    github:'Aiyaan-Mahajan',
+  },
+  
 ];
